@@ -51,10 +51,10 @@ def extract_text_from_pdf(pdf_file):
 def extract_structured_data(cv_text):
     structured_prompt_2 = """ 
 Read the following CV text deeply and convert it into a JSON data structure with the following keys and specifications: 
-"Skills": The value should be a dictionary like technical skills, tools, programming languages, communication, leadership, etc., from the resume.
+"Skills": The value should be a comma seperated list which contains skills(examples are technical skills, tools, programming languages,soft skills etc.,)from the resume.It should not be a nested list it should be a single list which contains all the skills sepe.
 "Title": This should describe their expertise like software developer, web designer, chartered accountant, etc. This should be their main profession mentioned in the resume.
 "Education": The value should be a list of dictionaries, each containing details like institution, degree, field of study, start/end dates, description, etc.
-"Work experience": The value should be a list of dictionaries, each containing details like company name, position, start/end dates, description, etc.
+"Work experience": The value should be a list of dictionaries, each containing details like company name, position, start/end dates, description.
 "Languages": A list of dictionaries with language and proficiency (basic, fluent, expert, or null if not mentioned).
 "Bio": A paragraph or bullet points summarizing the individual.
 "Hourly rate": The rate mentioned in the CV, or null if not available.
