@@ -22,7 +22,7 @@ class Agent:
         self.system = system
         self.messages = []
         if self.system:
-            self.messages.append(SystemMessage(content=system))
+            self.messages.append(SystemMessage(content=self.system))
     
     def __call__(self, message):
         self.messages.append(HumanMessage(content=message))
@@ -31,7 +31,8 @@ class Agent:
         return result
     
     def execute(self):
-        chat = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3, convert_system_message_to_human=True)
+        # Use Gemini API without specifying the version
+        chat = ChatGoogleGenerativeAI(model="gemini-pro",temperature=0.3,convert_system_message_to_human=True)
         result = chat.invoke(self.messages)
         return result.content
 
@@ -49,44 +50,24 @@ def extract_text_from_pdf(pdf_file):
 # Function to extract structured data from CV text
 def extract_structured_data(cv_text):
     structured_prompt_2 = """ 
-Read the following CV text 100 times, deeply understand it and than Convert the following CV text into a JSON data structure with the following keys and specifications: 
-"Skills": The value should be a dictionary like technical skills, tools, programming languages,communication, leadership etc from the resume
-"Title":This should describe their expertise like software develop,web designer,chartered accountant,loco pilot etc.This should be their main profession which they have mentioned or done before mentioned in the resume
-"Education": The value should be a list of dictionaries, each containing information about the below ones[The values are examples given for understanding but the keys should not be changed]
-1-School/institution:XYZ college
-2-Degree(optional):BTECH
-3-Field of study(optional):Chemical engineering
-4-Percentage(optional):95%
-5-CGPA(optional):9.8
-6-Start date(optional):12-12-12
-7-End date(optional):12-12-14
-8-Description- of the particular education like studied btech computer science in xyz university
-All the things mentioned from 1 to 6 should be keys for their own without changing the keys anytime you give the answer.If there are multiple educations each should be provided in the same format as above with a numbering for every education qualification starting from 1 like 1,2,3,4..
-"Work experience":The value should be a list of dictionaries, each containing information about the below ones[The values are examples given for understanding but the keys should not be changed]
-1- Company: Company XYZ
-2-Position :Software developer
-3-Start date: 12-12-16
-4-End date: 12-12-18
-5-Description:Worked in fixing bugs
-If there are multiple work/intern/job experience each should be provided in the same format as above with a numbering for every work/job/intern starting from 1 like 1,2,3,4..
-"Languages":The value should be a list of dictionaries, each dictionary ahould be like the below ones 
-{language known mentioned in the cv like english,tamil,telugu etc:proficiency of the specified language(one of basic,fluent,expert and null if nothing is mentioned)
-If there are multiple languages each should be provided in the same format as above with a numbering for every work/job/intern starting from 1 like 1,2,3,4..
-"Bio":From the cv analyse and give a paragraph or bullet points help people get to know a glance at the person(whose cv we are analysing) what work does the person(whose cv we are analysing) do the best
-"Hourly rate":This is the rate in which clients hire.If it is mentioned in the cv mention it or else null
-"Phone number":Phone number if it is mentioned in the cv mention it here.If there are multiple phone numbers then mention everything here
-"Date of birth":date of birth if it is mentioned in the cv mention it here
-"Address":Address if it is mentioned in cv mention it here
-"Country":Mention the country of living it is mentioned in the cv
-"State":Mention the state of living it is mentioned in the cv
-"City/Province":Mention the city/province of living it is mentioned in the cv
-"Zip/Postal code":Mention the zip/postal code of living it is mentioned in the cv
-
-
-The Final Output Should start with '
-json' and trailing with '
-'. 
+Read the following CV text deeply and convert it into a JSON data structure with the following keys and specifications: 
+"Skills": The value should be a dictionary like technical skills, tools, programming languages, communication, leadership, etc., from the resume.
+"Title": This should describe their expertise like software developer, web designer, chartered accountant, etc. This should be their main profession mentioned in the resume.
+"Education": The value should be a list of dictionaries, each containing details like institution, degree, field of study, start/end dates, description, etc.
+"Work experience": The value should be a list of dictionaries, each containing details like company name, position, start/end dates, description, etc.
+"Languages": A list of dictionaries with language and proficiency (basic, fluent, expert, or null if not mentioned).
+"Bio": A paragraph or bullet points summarizing the individual.
+"Hourly rate": The rate mentioned in the CV, or null if not available.
+"Phone number": Phone numbers mentioned in the CV.
+"Date of birth": Date of birth if mentioned.
+"Address": Address if mentioned.
+"Country": Country of residence if mentioned.
+"State": State of residence if mentioned.
+"City/Province": City or province of residence if mentioned.
+"Zip/Postal code": Postal code if mentioned.
+The output should be in JSON format.
 """.strip() 
+
     bot2 = Agent(structured_prompt_2)
     res = bot2(cv_text)
     text_to = res.strip().strip('```').strip('```json')
